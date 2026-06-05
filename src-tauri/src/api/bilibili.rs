@@ -98,28 +98,44 @@ pub async fn get_room_info(room_id: &str) -> Result<RoomInfo> {
     // 组合数据
     let keyframe = room_data.keyframe.unwrap_or_default();
     let user_cover = room_data.user_cover.unwrap_or_default();
+    let uname = user_data.uname.clone();
+    
+    println!("[DEBUG] 房间 {} API响应 - UID: {}, 直播状态: {}", room_data.room_id, room_data.uid, room_data.live_status);
+    println!("[DEBUG] 主播 {} 原始头像URL: '{}'", uname, user_data.face);
     
     Ok(RoomInfo {
         id: room_data.room_id.to_string(),
         uid: room_data.uid,
-        name: user_data.uname,
+        name: uname.clone(),
         avatar: {
             let face_url = user_data.face.trim();
-            if face_url.is_empty() || face_url.contains("noface") {
+            let avatar_url = if face_url.is_empty() || face_url.contains("noface") {
+                println!("[DEBUG] 主播 {} 头像为空或无效,使用默认头像", uname);
                 "https://i0.hdslb.com/bfs/face/member/noface.jpg".to_string()
             } else if face_url.starts_with("http://") {
-                face_url.replace("http://", "https://")
+                let https_url = face_url.replace("http://", "https://");
+                println!("[DEBUG] 主播 {} HTTP头像转换为HTTPS", uname);
+                https_url
             } else {
+                println!("[DEBUG] 主播 {} 使用头像: {}", uname, face_url);
                 face_url.to_string()
-            }
+            };
+            avatar_url
         },
         title: room_data.title,
-        cover: if !keyframe.is_empty() && room_data.live_status == 1 {
-            keyframe.clone()
-        } else if !user_cover.is_empty() {
-            user_cover
-        } else {
-            room_data.cover.unwrap_or_default()
+        cover: {
+            let cover_url = if !keyframe.is_empty() && room_data.live_status == 1 {
+                println!("[DEBUG] 房间 {} 直播中,使用关键帧封面", room_data.room_id);
+                keyframe.clone()
+            } else if !user_cover.is_empty() {
+                println!("[DEBUG] 房间 {} 使用用户封面", room_data.room_id);
+                user_cover.clone()
+            } else {
+                println!("[DEBUG] 房间 {} 使用默认封面", room_data.room_id);
+                room_data.cover.clone().unwrap_or_default()
+            };
+            println!("[DEBUG] 房间 {} 最终封面URL长度: {} 字符", room_data.room_id, cover_url.len());
+            cover_url
         },
         keyframe: if keyframe.is_empty() { None } else { Some(keyframe) },
         is_live: room_data.live_status == 1,

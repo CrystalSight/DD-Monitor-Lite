@@ -3749,6 +3749,7 @@ name = "tauri-app"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "log",
  "reqwest 0.11.27",
  "serde",
  "serde_json",
