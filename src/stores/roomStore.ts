@@ -46,23 +46,26 @@ export const useRoomStore = create<RoomStore>()(
           
           // 检测开播/下播状态变化
           if (oldRoom && oldRoom.isLive !== room.isLive) {
-            if (room.isLive && !oldRoom.isLive) {
-              // 开播通知
-              invoke('send_notification', {
-                appHandle: null,
-                title: `${room.name} 开播了!`,
-                body: room.title
-              }).catch(console.error);
-            } else if (!room.isLive && oldRoom.isLive) {
-              // 下播通知
-              const duration = room.startTime 
-                ? Math.floor((Date.now() / 1000) - room.startTime)
-                : room.onlineCount || 0;
-              invoke('send_notification', {
-                appHandle: null,
-                title: `${room.name} 已下播`,
-                body: `本次直播时长: ${formatDuration(duration)}`
-              }).catch(console.error);
+            // 只在通知启用时发送
+            if (state.notificationsEnabled) {
+              if (room.isLive && !oldRoom.isLive) {
+                // 开播通知
+                invoke('send_notification', {
+                  appHandle: null,
+                  title: `${room.name} 开播了!`,
+                  body: room.title
+                }).catch(console.error);
+              } else if (!room.isLive && oldRoom.isLive) {
+                // 下播通知
+                const duration = room.startTime 
+                  ? Math.floor((Date.now() / 1000) - room.startTime)
+                  : room.onlineCount || 0;
+                invoke('send_notification', {
+                  appHandle: null,
+                  title: `${room.name} 已下播`,
+                  body: `本次直播时长: ${formatDuration(duration)}`
+                }).catch(console.error);
+              }
             }
           }
           

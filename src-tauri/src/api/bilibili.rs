@@ -3,6 +3,7 @@ use serde::{Deserialize, Serialize};
 use anyhow::Result;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
+#[serde(rename_all = "camelCase")]
 pub struct RoomInfo {
     pub id: String,
     pub uid: u64,

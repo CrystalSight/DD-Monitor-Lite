@@ -8,3 +8,9 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
     <App />
   </React.StrictMode>,
 );
+
+// 禁用右键菜单
+document.addEventListener('contextmenu', (e) => {
+  e.preventDefault();
+  return false;
+});
