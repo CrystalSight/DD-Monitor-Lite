@@ -25,6 +25,8 @@ struct RoomBasicInfo {
     uid: u64,
     title: String,
     cover: Option<String>,
+    keyframe: Option<String>,
+    user_cover: Option<String>,
     live_status: i32,
     live_start_time: Option<u64>,
     online: u64,
@@ -94,18 +96,32 @@ pub async fn get_room_info(room_id: &str) -> Result<RoomInfo> {
     let user_data = user_api.data.info;
     
     // 组合数据
+    let keyframe = room_data.keyframe.unwrap_or_default();
+    let user_cover = room_data.user_cover.unwrap_or_default();
+    
     Ok(RoomInfo {
         id: room_data.room_id.to_string(),
         uid: room_data.uid,
         name: user_data.uname,
-        avatar: if user_data.face.is_empty() {
-            "https://i0.hdslb.com/bfs/face/member/noface.jpg".to_string()
-        } else {
-            user_data.face
+        avatar: {
+            let face_url = user_data.face.trim();
+            if face_url.is_empty() || face_url.contains("noface") {
+                "https://i0.hdslb.com/bfs/face/member/noface.jpg".to_string()
+            } else if face_url.starts_with("http://") {
+                face_url.replace("http://", "https://")
+            } else {
+                face_url.to_string()
+            }
         },
         title: room_data.title,
-        cover: room_data.cover.unwrap_or_default(),
-        keyframe: None,
+        cover: if !keyframe.is_empty() && room_data.live_status == 1 {
+            keyframe.clone()
+        } else if !user_cover.is_empty() {
+            user_cover
+        } else {
+            room_data.cover.unwrap_or_default()
+        },
+        keyframe: if keyframe.is_empty() { None } else { Some(keyframe) },
         is_live: room_data.live_status == 1,
         live_status: room_data.live_status,
         start_time: room_data.live_start_time,

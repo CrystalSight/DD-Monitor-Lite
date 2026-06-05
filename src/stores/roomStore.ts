@@ -21,6 +21,12 @@ export const useRoomStore = create<RoomStore>()(
       notificationsEnabled: false,
       
       addRoom: async (roomId) => {
+        // 检查是否已存在
+        const existingRoom = get().rooms.find(r => r.id === roomId);
+        if (existingRoom) {
+          throw new Error(`直播间 ${roomId} 已在监控列表中`);
+        }
+        
         try {
           const info = await invoke<LiveRoom>('fetch_room_info', { roomId });
           set((state) => ({
