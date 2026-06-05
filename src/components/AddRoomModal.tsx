@@ -9,13 +9,47 @@ export function AddRoomModal({ onClose, onAdd }: AddRoomModalProps) {
   const [roomId, setRoomId] = useState('');
   const [loading, setLoading] = useState(false);
 
+  // 从输入中提取房间号
+  const extractRoomId = (input: string): string => {
+    const trimmed = input.trim();
+    
+    // 如果已经是纯数字,直接返回
+    if (/^\d+$/.test(trimmed)) {
+      return trimmed;
+    }
+    
+    // 尝试从 URL 中提取房间号
+    // 支持的格式:
+    // https://live.bilibili.com/226054
+    // https://live.bilibili.com/blanc/226054
+    // http://live.bilibili.com/226054
+    const urlPatterns = [
+      /live\.bilibili\.com\/(\d+)/,
+      /live\.bilibili\.com\/blanc\/(\d+)/,
+    ];
+    
+    for (const pattern of urlPatterns) {
+      const match = trimmed.match(pattern);
+      if (match && match[1]) {
+        return match[1];
+      }
+    }
+    
+    // 如果不是 URL 也不是纯数字,返回原始输入(让后端处理错误)
+    return trimmed;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!roomId.trim()) return;
     
     setLoading(true);
     try {
-      await onAdd(roomId.trim());
+      const extractedId = extractRoomId(roomId);
+      await onAdd(extractedId);
+    } catch (error) {
+      console.error('Add room error:', error);
+      throw error;
     } finally {
       setLoading(false);
     }

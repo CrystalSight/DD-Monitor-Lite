@@ -5,12 +5,12 @@ export interface LiveRoom {
   avatar: string;          // 主播头像 URL
   title: string;           // 直播标题
   cover: string;           // 直播封面图
-  keyframe?: string;       // 直播画面快照
+  keyframe?: string | null;       // 直播画面快照
   isLive: boolean;         // 开播状态
-  liveStatus?: number;     // 直播状态码
-  startTime?: number;      // 开播时间戳
-  onlineCount?: number;    // 在线人数
-  areaName?: string;       // 分区名称
+  liveStatus: number;      // 直播状态码
+  startTime?: number | null;      // 开播时间戳
+  onlineCount: number;     // 在线人数
+  areaName: string;        // 分区名称
   addedAt?: number;        // 添加时间戳
   duration?: number;       // 直播时长（秒）
 }

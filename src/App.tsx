@@ -81,7 +81,9 @@ export default function App() {
               await addRoom(roomId);
               setShowAddModal(false);
             } catch (error) {
-              alert('添加失败,请检查房间号是否正确');
+              const errorMessage = error instanceof Error ? error.message : String(error);
+              alert(`添加失败: ${errorMessage}`);
+              console.error('Failed to add room:', error);
             }
           }}
         />
