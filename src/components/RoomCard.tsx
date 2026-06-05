@@ -22,9 +22,11 @@ export function RoomCard({ room, onRemove }: RoomCardProps) {
           src={room.avatar} 
           alt={room.name}
           className="w-16 h-16 rounded-full object-cover border-2 border-gray-200"
-          loading="lazy"
+          referrerPolicy="no-referrer"
+          loading="eager"
           onError={(e) => {
-            (e.target as HTMLImageElement).src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"%3E%3Crect width="100" height="100" fill="%23ddd"/%3E%3Ctext x="50" y="50" text-anchor="middle" dy=".3em" fill="%23999" font-size="40"%3E👤%3C/text%3E%3C/svg%3E';
+            console.error('头像加载失败:', room.avatar);
+            (e.target as HTMLImageElement).src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"%3E%3Crect width="100" height="100" fill="%23ddd"/%3E%3Ctext x="50" y="50" text-anchor="middle" dy=".3em" fill="%23999" font-size="40"%3E%3C/text%3E%3C/svg%3E';
           }}
         />
         
@@ -53,8 +55,10 @@ export function RoomCard({ room, onRemove }: RoomCardProps) {
               src={room.cover} 
               alt="直播封面"
               className="mt-2 w-full h-32 object-cover rounded bg-gray-100"
-              loading="lazy"
+              referrerPolicy="no-referrer"
+              loading="eager"
               onError={(e) => {
+                console.error('封面加载失败:', room.cover);
                 (e.target as HTMLImageElement).style.display = 'none';
               }}
             />
