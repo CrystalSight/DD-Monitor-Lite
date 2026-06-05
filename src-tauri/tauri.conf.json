@@ -18,7 +18,16 @@
       }
     ],
     "security": {
-      "csp": null
+      "csp": {
+        "default-src": ["'self'", "custom:", "asset:"],
+        "img-src": [
+          "'self'",
+          "data:",
+          "asset:",
+          "https://*.hdslb.com",
+          "https://*.bilibili.com"
+        ]
+      }
     }
   },
   "bundle": {
