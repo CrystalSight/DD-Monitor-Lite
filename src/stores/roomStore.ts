@@ -109,9 +109,10 @@ export const useRoomStore = create<RoomStore>()(
           liveRooms.map(async (room) => {
             try {
               const info = await invoke<LiveRoom>('fetch_room_info', { roomId: room.id });
-              // 如果直播中,确保封面使用最新的 keyframe
+              // 如果直播中,确保封面使用最新的 keyframe,并添加随机参数防止缓存
               if (info.isLive && info.keyframe) {
-                info.cover = info.keyframe;
+                const timestamp = Date.now();
+                info.cover = `${info.keyframe}&_t=${timestamp}`;
               }
               get().updateRoom(info);
             } catch (error) {
