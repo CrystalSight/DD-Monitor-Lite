@@ -137,7 +137,15 @@ pub async fn get_room_info(room_id: &str) -> Result<RoomInfo> {
             println!("[DEBUG] 房间 {} 最终封面URL长度: {} 字符", room_data.room_id, cover_url.len());
             cover_url
         },
-        keyframe: if keyframe.is_empty() { None } else { Some(keyframe) },
+        keyframe: if keyframe.is_empty() { 
+            None 
+        } else { 
+            // 添加时间戳,强制浏览器每次重新请求
+            Some(format!("{}?t={}", keyframe, std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_secs()))
+        },
         is_live: room_data.live_status == 1,
         live_status: room_data.live_status,
         start_time: room_data.live_start_time,

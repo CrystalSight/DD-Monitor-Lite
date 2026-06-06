@@ -94,11 +94,25 @@ export const useRoomStore = create<RoomStore>()(
       
       checkStatusChanges: async () => {
         const rooms = get().rooms;
-        // 并行请求所有房间信息，提高性能
+        // 只对直播中的房间请求更新,减少资源消耗
+        const liveRooms = rooms.filter(r => r.isLive);
+        
+        if (liveRooms.length === 0) {
+          console.log('无直播中房间,跳过本次轮询');
+          return;
+        }
+        
+        console.log(`开始更新 ${liveRooms.length} 个直播中的房间`);
+        
+        // 并行请求所有直播中的房间信息，提高性能
         await Promise.all(
-          rooms.map(async (room) => {
+          liveRooms.map(async (room) => {
             try {
               const info = await invoke<LiveRoom>('fetch_room_info', { roomId: room.id });
+              // 如果直播中,确保封面使用最新的 keyframe
+              if (info.isLive && info.keyframe) {
+                info.cover = info.keyframe;
+              }
               get().updateRoom(info);
             } catch (error) {
               console.error(`Failed to check room ${room.id}:`, error);

@@ -81,7 +81,15 @@ export default function App() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {rooms.map(room => (
+            {rooms
+              .sort((a, b) => {
+                // 正在直播的排在前面
+                if (a.isLive && !b.isLive) return -1;
+                if (!a.isLive && b.isLive) return 1;
+                // 同为直播或未开播,按添加时间倒序(新的在前)
+                return (b.addedAt || 0) - (a.addedAt || 0);
+              })
+              .map(room => (
               <ErrorBoundary key={room.id}>
                 <RoomCard 
                   room={room} 
