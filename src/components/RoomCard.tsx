@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { LiveRoom } from '../types';
 import { formatDuration } from '../utils/format';
-import { openUrl } from '@tauri-apps/plugin-shell';
+import { open } from '@tauri-apps/plugin-shell';
 
 interface RoomCardProps {
   room: LiveRoom;
@@ -20,7 +20,7 @@ export function RoomCard({ room, onRemove }: RoomCardProps) {
       className="bg-white rounded-lg shadow-md p-4 hover:shadow-lg transition-shadow border border-gray-100 cursor-pointer"
       onDoubleClick={async () => {
         try {
-          await openUrl(`https://live.bilibili.com/${room.id}`);
+          await open(`https://live.bilibili.com/${room.id}`);
         } catch (error) {
           console.error('打开直播间失败:', error);
           // 降级方案:使用 window.open
