@@ -1,7 +1,4 @@
-import { useMemo } from 'react';
 import { LiveRoom } from '../types';
-import { formatDuration } from '../utils/format';
-import { open } from '@tauri-apps/plugin-shell';
 
 interface RoomCardProps {
   room: LiveRoom;
@@ -9,23 +6,13 @@ interface RoomCardProps {
 }
 
 export function RoomCard({ room, onRemove }: RoomCardProps) {
-  const duration = useMemo(() => {
-    return room.startTime && room.isLive
-      ? Math.floor((Date.now() / 1000) - room.startTime)
-      : room.duration || 0;
-  }, [room.startTime, room.isLive, room.duration]);
-
   return (
     <div 
       className="bg-white rounded-lg shadow-md p-4 hover:shadow-lg transition-shadow border border-gray-100 cursor-pointer"
-      onDoubleClick={async () => {
-        try {
-          await open(`https://live.bilibili.com/${room.id}`);
-        } catch (error) {
-          console.error('打开直播间失败:', error);
-          // 降级方案:使用 window.open
-          window.open(`https://live.bilibili.com/${room.id}`, '_blank');
-        }
+      onDoubleClick={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        window.open(`https://live.bilibili.com/${room.id}`, '_blank');
       }}
     >
       <div className="flex items-start gap-4">
@@ -84,30 +71,11 @@ export function RoomCard({ room, onRemove }: RoomCardProps) {
                 <span>{room.areaName}</span>
               </div>
             )}
-            {room.isLive && (
-              <>
-                {room.onlineCount !== undefined && (
-                  <div className="flex items-center gap-1">
-                    <span>👥</span>
-                    <span>{room.onlineCount.toLocaleString()} 人观看</span>
-                  </div>
-                )}
-                {room.startTime && (
-                  <>
-                    <div className="flex items-center gap-1">
-                      <span>🕐</span>
-                      <span>开播 {new Date(room.startTime * 1000).toLocaleTimeString('zh-CN', { 
-                        hour: '2-digit', 
-                        minute: '2-digit' 
-                      })}</span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <span>⏱️</span>
-                      <span>已播 {formatDuration(duration)}</span>
-                    </div>
-                  </>
-                )}
-              </>
+            {room.isLive && room.onlineCount !== undefined && (
+              <div className="flex items-center gap-1">
+                <span>👥</span>
+                <span>{room.onlineCount.toLocaleString()} 人观看</span>
+              </div>
             )}
           </div>
         </div>
