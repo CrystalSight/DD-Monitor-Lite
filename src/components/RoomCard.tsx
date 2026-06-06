@@ -1,4 +1,5 @@
 import { LiveRoom } from '../types';
+import { open } from '@tauri-apps/plugin-shell';
 
 interface RoomCardProps {
   room: LiveRoom;
@@ -7,14 +8,7 @@ interface RoomCardProps {
 
 export function RoomCard({ room, onRemove }: RoomCardProps) {
   return (
-    <div 
-      className="bg-white rounded-lg shadow-md p-4 hover:shadow-lg transition-shadow border border-gray-100 cursor-pointer"
-      onDoubleClick={(e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        window.open(`https://live.bilibili.com/${room.id}`, '_blank');
-      }}
-    >
+    <div className="bg-white rounded-lg shadow-md p-4 hover:shadow-lg transition-shadow border border-gray-100">
       <div className="flex items-start gap-4">
         {/* 主播头像 */}
         <img 
@@ -80,16 +74,36 @@ export function RoomCard({ room, onRemove }: RoomCardProps) {
           </div>
         </div>
         
-        {/* 删除按钮 */}
-        <button 
-          onClick={onRemove}
-          className="text-gray-400 hover:text-red-500 transition-colors p-1"
-          title="移除直播间"
-        >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
+        {/* 操作按钮组 */}
+        <div className="flex flex-col gap-2">
+          {/* 打开直播间按钮 */}
+          <button 
+            onClick={async () => {
+              try {
+                await open(`https://live.bilibili.com/${room.id}`);
+              } catch (error) {
+                console.error('打开直播间失败:', error);
+              }
+            }}
+            className="text-gray-400 hover:text-blue-500 transition-colors p-1"
+            title="在浏览器中打开"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+            </svg>
+          </button>
+          
+          {/* 删除按钮 */}
+          <button 
+            onClick={onRemove}
+            className="text-gray-400 hover:text-red-500 transition-colors p-1"
+            title="移除直播间"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
       </div>
     </div>
   );
