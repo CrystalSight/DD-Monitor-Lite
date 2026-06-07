@@ -57,7 +57,7 @@ npm run tauri build
 ## 注意事项
 
 - 首次使用时需要授予通知权限
-- 直播间状态每 30 秒自动刷新一次
+- 直播间状态每 120 秒(2 分钟)自动刷新一次
 - 图片加载失败时会显示默认占位图
 - 请遵守 Bilibili API 使用规范,仅用于学习测试
 
@@ -73,12 +73,13 @@ dd-monitor-lite/
 ├── src-tauri/              # Tauri Rust 后端
 │   ├── src/
 │   │   ├── api/            # Bilibili API 封装
-│   │   ├── commands.rs     # Tauri 命令
-│   │   └── monitor.rs      # 监控服务
+│   │   └── commands.rs     # Tauri 命令
 │   └── Cargo.toml          # Rust 依赖配置
 └── package.json
 ```
 
 ## 许可证
 
-本项目仅供学习测试使用,请遵守相关法律法规和 Bilibili 使用条款。
+本项目采用 MIT 许可证 - 详见 [LICENSE](LICENSE) 文件。
+
+> 免责声明:本项目仅供学习交流使用,请遵守 Bilibili 用户协议及相关法律法规。

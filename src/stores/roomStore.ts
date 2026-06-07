@@ -29,16 +29,6 @@ export const useRoomStore = create<RoomStore>()(
         try {
           const info = await invoke<LiveRoom>('fetch_room_info', { roomId });
             
-          // 调试日志
-          console.log('=== 房间信息调试 ===');
-          console.log('房间ID:', info.id);
-          console.log('主播名称:', info.name);
-          console.log('头像URL:', info.avatar);
-          console.log('封面URL:', info.cover);
-          console.log('关键帧:', info.keyframe);
-          console.log('直播状态:', info.isLive);
-          console.log('==================');
-            
           set((state) => ({
             rooms: [...state.rooms, { ...info, addedAt: Date.now() }]
           }));
