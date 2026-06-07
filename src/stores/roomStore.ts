@@ -101,10 +101,9 @@ export const useRoomStore = create<RoomStore>()(
           rooms.map(async (room) => {
             try {
               const info = await invoke<LiveRoom>('fetch_room_info', { roomId: room.id });
-              // 只对直播中的房间添加时间戳防缓存
+              // 后端已在 keyframe 中添加时间戳,直接使用
               if (info.isLive && info.keyframe) {
-                const timestamp = Date.now();
-                info.cover = `${info.keyframe}&_t=${timestamp}`;
+                info.cover = info.keyframe;
               }
               get().updateRoom(info);
             } catch (error) {
