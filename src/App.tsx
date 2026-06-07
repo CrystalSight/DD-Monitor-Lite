@@ -16,7 +16,7 @@ export default function App() {
   useEffect(() => {
     const interval = setInterval(() => {
       checkStatusChanges();
-    }, 30000); // 每30秒检查一次
+    }, 120000); // 每120秒(2分钟)检查一次
 
     // 立即执行一次
     checkStatusChanges();
