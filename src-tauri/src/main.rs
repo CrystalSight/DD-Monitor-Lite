@@ -3,7 +3,6 @@
 
 mod api;
 mod commands;
-mod monitor;
 
 fn main() {
     tauri::Builder::default()
@@ -14,7 +13,6 @@ fn main() {
             commands::fetch_room_info,
             commands::add_monitored_room,
             commands::remove_monitored_room,
-            commands::start_monitoring,
             commands::request_notification_permission,
             commands::send_notification
         ])

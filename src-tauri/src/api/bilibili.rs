@@ -1,6 +1,5 @@
-use reqwest;
 use serde::{Deserialize, Serialize};
-use anyhow::Result;
+use anyhow::{Result, anyhow};
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[serde(rename_all = "camelCase")]
@@ -75,7 +74,7 @@ pub async fn get_room_info(room_id: &str) -> Result<RoomInfo> {
     let room_api: RoomBasicApiResponse = room_response.json().await?;
     
     if room_api.code != 0 {
-        return Err(anyhow::anyhow!("获取房间信息失败: {}", room_api.message));
+        return Err(anyhow!("获取房间信息失败: {}", room_api.message));
     }
     
     let room_data = room_api.data;
@@ -90,7 +89,7 @@ pub async fn get_room_info(room_id: &str) -> Result<RoomInfo> {
     let user_api: UserApiResponse = user_response.json().await?;
     
     if user_api.code != 0 {
-        return Err(anyhow::anyhow!("获取用户信息失败: {}", user_api.message));
+        return Err(anyhow!("获取用户信息失败: {}", user_api.message));
     }
     
     let user_data = user_api.data.info;
@@ -152,18 +151,4 @@ pub async fn get_room_info(room_id: &str) -> Result<RoomInfo> {
         online_count: room_data.online,
         area_name: room_data.area_name,
     })
-}
-
-pub async fn batch_get_room_info(room_ids: &[String]) -> Result<Vec<RoomInfo>> {
-    let mut results = Vec::new();
-    
-    for room_id in room_ids {
-        match get_room_info(room_id).await {
-            Ok(info) => results.push(info),
-            Err(e) => eprintln!("Failed to fetch room {}: {}", room_id, e),
-        }
-        tokio::time::sleep(tokio::time::Duration::from_millis(100)).await;
-    }
-    
-    Ok(results)
 }

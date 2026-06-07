@@ -2,7 +2,6 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { invoke } from '@tauri-apps/api/core';
 import { LiveRoom } from '../types';
-import { formatDuration } from '../utils/format';
 
 interface RoomStore {
   rooms: LiveRoom[];
@@ -68,19 +67,14 @@ export const useRoomStore = create<RoomStore>()(
               if (room.isLive && !oldRoom.isLive) {
                 // 开播通知
                 invoke('send_notification', {
-                  appHandle: null,
                   title: `${room.name} 开播了!`,
                   body: room.title
                 }).catch(console.error);
               } else if (!room.isLive && oldRoom.isLive) {
                 // 下播通知
-                const duration = room.startTime 
-                  ? Math.floor((Date.now() / 1000) - room.startTime)
-                  : room.onlineCount || 0;
                 invoke('send_notification', {
-                  appHandle: null,
                   title: `${room.name} 已下播`,
-                  body: `本次直播时长: ${formatDuration(duration)}`
+                  body: '直播已结束'
                 }).catch(console.error);
               }
             }
@@ -94,22 +88,20 @@ export const useRoomStore = create<RoomStore>()(
       
       checkStatusChanges: async () => {
         const rooms = get().rooms;
-        // 只对直播中的房间请求更新,减少资源消耗
-        const liveRooms = rooms.filter(r => r.isLive);
         
-        if (liveRooms.length === 0) {
-          console.log('无直播中房间,跳过本次轮询');
+        if (rooms.length === 0) {
+          console.log('无监控房间,跳过本次轮询');
           return;
         }
         
-        console.log(`开始更新 ${liveRooms.length} 个直播中的房间`);
+        console.log(`开始更新 ${rooms.length} 个房间`);
         
-        // 并行请求所有直播中的房间信息，提高性能
+        // 并行请求所有房间信息，提高性能并检测状态变化
         await Promise.all(
-          liveRooms.map(async (room) => {
+          rooms.map(async (room) => {
             try {
               const info = await invoke<LiveRoom>('fetch_room_info', { roomId: room.id });
-              // 如果直播中,确保封面使用最新的 keyframe,并添加随机参数防止缓存
+              // 只对直播中的房间添加时间戳防缓存
               if (info.isLive && info.keyframe) {
                 const timestamp = Date.now();
                 info.cover = `${info.keyframe}&_t=${timestamp}`;
@@ -124,7 +116,7 @@ export const useRoomStore = create<RoomStore>()(
       
       enableNotifications: async () => {
         try {
-          await invoke('request_notification_permission', { appHandle: null });
+          await invoke('request_notification_permission');
           set({ notificationsEnabled: true });
         } catch (error) {
           console.error('Failed to enable notifications:', error);
@@ -132,7 +124,7 @@ export const useRoomStore = create<RoomStore>()(
       }
     }),
     {
-      name: 'dd-monitor-storage',
+      name: import.meta.env.DEV ? 'dd-monitor-storage-dev' : 'dd-monitor-storage',
       partialize: (state) => ({ 
         rooms: state.rooms,
         notificationsEnabled: state.notificationsEnabled 

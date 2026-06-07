@@ -12,5 +12,4 @@ export interface LiveRoom {
   onlineCount: number;     // 在线人数
   areaName: string;        // 分区名称
   addedAt?: number;        // 添加时间戳
-  duration?: number;       // 直播时长（秒）
 }
