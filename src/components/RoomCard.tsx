@@ -45,6 +45,7 @@ export function RoomCard({ room, onRemove }: RoomCardProps) {
           {/* 封面图 */}
           {room.cover && (
             <img 
+              key={room.cover}
               src={room.cover} 
               alt="直播封面"
               className="mt-2 w-full h-32 object-cover rounded bg-gray-100"
