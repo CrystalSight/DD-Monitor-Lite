@@ -133,7 +133,10 @@ export const useRoomStore = create<RoomStore>()(
     }),
     {
       name: 'dd-monitor-storage',
-      partialize: (state) => ({ rooms: state.rooms })
+      partialize: (state) => ({ 
+        rooms: state.rooms,
+        notificationsEnabled: state.notificationsEnabled 
+      })
     }
   )
 );
